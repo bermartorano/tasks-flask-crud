@@ -50,3 +50,40 @@ def test_get_task():
     assert 'description' in response_json
     assert 'completed' in response_json
     assert response_json['id'] == task_id
+
+
+def test_update_task():
+    global tasks_ids
+    if not tasks_ids:
+        pytest.skip("No tasks available to test.")
+
+    task_id = tasks_ids[0]
+    updated_data = {
+        "title": "Updated Task",
+        "description": "This is an updated test task.",
+        "completed": True
+    }
+
+    response = requests.put(f"{BASE_URL}/tasks/{task_id}", json=updated_data)
+    assert response.status_code == 200
+    assert response.json() == 'Task updated successfully!'
+
+    response = requests.get(f"{BASE_URL}/tasks/{task_id}")
+    response_json = response.json()
+    assert response_json['title'] == updated_data['title']
+    assert response_json['description'] == updated_data['description']
+    assert response_json['completed'] == updated_data['completed']
+
+
+def test_delete_task():
+    global tasks_ids
+    if not tasks_ids:
+        pytest.skip("No tasks available to test.")
+
+    task_id = tasks_ids[0]
+    response = requests.delete(f"{BASE_URL}/tasks/{task_id}")
+    assert response.status_code == 200
+    assert response.json() == 'Task deleted successfully!'
+
+    response = requests.get(f"{BASE_URL}/tasks/{task_id}")
+    assert response.status_code == 404
