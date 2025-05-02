@@ -40,5 +40,29 @@ def get_task(task_id):
         return jsonify('Task not found!'), 404
 
 
+@app.route('/tasks/<int:task_id>', methods=['PUT'])
+def update_task(task_id):
+    data = request.get_json()
+    task = next((task for task in tasks if task.id == task_id), None)
+    if task:
+        task.title = data.get('title', task.title)
+        task.description = data.get('description', task.description)
+        task.completed = data.get('completed', task.completed)
+        return jsonify('Task updated successfully!'), 200
+    else:
+        return jsonify('Task not found!'), 404
+
+
+@app.route('/tasks/<int:task_id>', methods=['DELETE'])
+def delete_task(task_id):
+    global tasks
+    task = next((task for task in tasks if task.id == task_id), None)
+    if task:
+        tasks = [task for task in tasks if task.id != task_id]
+        return jsonify('Task deleted successfully!'), 200
+    else:
+        return jsonify('Task not found!'), 404
+
+
 if __name__ == '__main__':
     app.run(debug=True)
